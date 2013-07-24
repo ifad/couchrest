@@ -900,8 +900,11 @@ describe CouchRest::Database do
       @db.save_doc({'_id' => 'dave', 'name' => 'Dave', 'age' => '33'})
     end
 
-    it "should be able to search a database using couchdb-lucene" do
-      if couchdb_lucene_available?
+
+    %w( get post ).each do |method|
+      it "should work via #{method.upcase}" do
+        CouchRest.lucene_request_method = method.intern
+
         result = @db.search('search/people', :q => 'name:J*')
         doc_ids = result['rows'].collect{ |row| row['id'] }
         doc_ids.size.should == 2
@@ -909,6 +912,7 @@ describe CouchRest::Database do
         doc_ids.should include('jack')
       end
     end
-  end
+
+  end if couchdb_lucene_available?
 
 end

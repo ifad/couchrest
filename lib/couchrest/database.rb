@@ -294,10 +294,42 @@ module CouchRest
 
     # Query a CouchDB-Lucene search view
     def fti(name, params={})
-      # -> http://localhost:5984/yourdb/_fti/YourDesign/by_name?include_docs=true&q=plop*'
-      view("_fti/#{name}", params)
+      send(fti_method, name, params)
     end
     alias :search :fti
+
+    def fti_via_get(name, params)
+      MultiJson.decode(CouchRest.get fti_url_for(name, params), :raw => true)
+    end
+
+    def fti_via_post(name, params)
+      query = params.delete(:q)
+      CouchRest.post fti_url_for(name, params), query, :raw => true
+    end
+
+    def fti_method
+      {:get => :fti_via_get,
+       :post => :fti_via_post}.fetch(CouchRest.lucene_request_method)
+    rescue KeyError
+      raise ArgumentError, "Invalid lucene query method: #{method}"
+    end
+
+    def fti_url_for(view, params)
+      @fti_base ||= begin
+        path = case (type = CouchRest.lucene_connection_type)
+        when :hook
+          [self.name, '_fti/_design']
+        when :handler
+          ['_fti', CouchRest.lucene_server_name, self.name, '_design']
+        else
+          raise ArgumentError, "Invalid lucene connection type: #{type}"
+        end
+
+        [@host, path].join('/')
+      end
+
+      CouchRest.paramify_url [@fti_base, view].join('/'), params
+    end
 
     # load a set of documents by passing an array of ids
     def get_bulk(ids)

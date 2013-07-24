@@ -130,6 +130,16 @@ module CouchRest
     def decode_json_objects
       @@decode_json_objects
     end
+
+    @@lucene_configuration = {
+      :request_method  => :get,
+      :connection_type => :hook,
+      :server_name     => 'local'
+    }.each do |k,|
+      define_method("lucene_#{k}") { @@lucene_configuration[k] }
+      define_method("lucene_#{k}=") { |v| @@lucene_configuration[k] = v}
+    end
+
   end # class << self
 end
 # For the sake of backwards compatability, generate a dummy ExtendedDocument class
