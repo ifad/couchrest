@@ -1,3 +1,8 @@
+# Purpose of this fork
+
+Add support to search CouchDB-Lucene views via POST. This is supported on
+[IFAD's fork of CouchDB-Lucene](https://github.com/ifad/couchdb-lucene).
+
 # CouchRest: CouchDB, close to the metal [![Build Status](https://travis-ci.org/couchrest/couchrest.png)](https://travis-ci.org/couchrest/couchrest)
 
 CouchRest is based on [CouchDB's couch.js test
